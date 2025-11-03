@@ -5,9 +5,7 @@ import { sendResponse } from "@/utils/response";
 import { NextRequest } from "next/server";
 import { eq, and } from "drizzle-orm";
 
-/**
- * POST: Enroll user in a course
- */
+
 export const POST = async (
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -20,7 +18,6 @@ export const POST = async (
       return sendResponse(401, null, "Unauthorized. Please login.");
     }
 
-    // Check if already enrolled
     const existingEnrollment = await db
       .select()
       .from(enrollments)

@@ -1,12 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import axios from 'axios';
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useSession } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
 
 
 
@@ -132,10 +132,8 @@ const Courses: React.FC = () => {
     return myCourses.some(course => course.course_id === courseId);
   };
 
-  // Flatten all courses from all pages
   const allCourses = data?.pages.flatMap(page => page.data) || [];
 
-  // Apply filters
   const filteredCourses = allCourses.filter(course => {
     if (filter.category && course.category !== filter.category) return false;
     if (filter.level && course.level !== filter.level) return false;
@@ -154,96 +152,6 @@ const Courses: React.FC = () => {
             Enhance your farming skills with our comprehensive courses and earn certificates upon completion
           </p>
         </div>
-
-        {/* My Courses Section */}
-        {myCourses.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-green-800 mb-6">My Courses</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {myCourses.map((enrollment) => (
-                <div
-                  key={enrollment.enrollment_id}
-                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
-                >
-                  <div className="h-32 bg-linear-to-br from-green-500 to-green-700 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-black bg-opacity-10"></div>
-                    <div className="absolute top-3 left-3">
-                      {enrollment.completed ? (
-                        <span className="bg-white bg-opacity-90 text-green-800 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center space-x-1">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                          <span>Completed</span>
-                        </span>
-                      ) : (
-                        <span className="bg-white bg-opacity-90 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full">
-                          In Progress
-                        </span>
-                      )}
-                    </div>
-                    <div className="absolute top-3 right-3">
-                      <div className="relative w-12 h-12">
-                        <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
-                          <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" />
-                          <circle cx="18" cy="18" r="16" fill="none" stroke="white" strokeWidth="2" strokeDasharray={`${(enrollment.progress.length / enrollment.total_modules) * 100}, 100`} className="transition-all duration-300" />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">
-                            {Math.round((enrollment.progress.length / enrollment.total_modules) * 100)}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">
-                      {enrollment.course_title}
-                    </h3>
-                    <div className="mb-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-gray-600">Progress</span>
-                        <span className="text-sm text-gray-500">
-                          {enrollment.progress.length} of {enrollment.total_modules} modules
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-linear-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${(enrollment.progress.length / enrollment.total_modules) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      {enrollment.completed ? (
-                        <Link
-                          href={`/certificate/${enrollment.enrollment_id}`}
-                          className="flex-1 bg-linear-to-r from-yellow-500 to-yellow-600 text-white text-center py-2.5 px-4 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 font-medium text-sm flex items-center justify-center space-x-1"
-                        >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h5a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h5a1 1 0 001-1V7l-7-5z" clipRule="evenodd" />
-                          </svg>
-                          <span>Certificate</span>
-                        </Link>
-                      ) : (
-                        <Link
-                          href={`/dashboard/courses/${enrollment.course_id}/modules`}
-                          className="w-full bg-linear-to-r from-green-600 to-green-700 text-white text-center py-2.5 px-4 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-medium text-sm flex items-center justify-center space-x-1"
-                        >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                          </svg>
-                          <span>Continue Learning</span>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* All Courses Section */}
         <div>
           <div className="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100">
             <h2 className="text-2xl font-bold text-green-800 mb-6">Available Courses</h2>
@@ -273,7 +181,7 @@ const Courses: React.FC = () => {
                 <option value="Advanced">🎓 Advanced</option>
               </select>
 
-              <button
+              <Button
                 onClick={() => setFilter({ category: '', level: '', language: '' })}
                 className="bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition-all duration-200 font-medium flex items-center space-x-2 shadow-md hover:shadow-lg"
               >
@@ -281,7 +189,7 @@ const Courses: React.FC = () => {
                   <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
                 </svg>
                 <span>Clear Filters</span>
-              </button>
+              </Button>
             </div>
 
             {/* Course Count */}
@@ -290,10 +198,8 @@ const Courses: React.FC = () => {
             </div>
           </div>
 
-          {/* Courses Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {isLoading ? (
-              // Show skeletons while loading
               Array.from({ length: 8 }).map((_, index) => (
                 <CourseSkeleton key={index} />
               ))
@@ -311,9 +217,8 @@ const Courses: React.FC = () => {
                   key={course.id}
                   className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
                 >
-                  {/* Course Header with Image Placeholder */}
                   <div className="h-40 bg-linear-to-r from-green-500 to-green-700 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                    <div className="absolute inset-0 bg-gray-400 bg-opacity-20"></div>
                     <div className="absolute top-3 left-3">
                       <span className="bg-white bg-opacity-90 text-green-800 text-xs font-semibold px-2.5 py-1 rounded-full">
                         {course.level}
@@ -326,12 +231,11 @@ const Courses: React.FC = () => {
                     </div>
                     <div className="absolute bottom-3 left-3 right-3">
                       <span className="bg-white bg-opacity-90 text-green-800 text-xs font-medium px-2 py-1 rounded-full inline-block">
-                        📚 {course.category}
+                        {course.category}
                       </span>
                     </div>
                   </div>
 
-                  {/* Course Content */}
                   <div className="p-5">
                     <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 min-h-14">
                       {course.title}
@@ -340,7 +244,6 @@ const Courses: React.FC = () => {
                       {course.description}
                     </p>
 
-                    {/* Course Stats */}
                     <div className="flex items-center justify-between mb-4 text-xs text-gray-500">
                       <div className="flex items-center space-x-1">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -356,7 +259,6 @@ const Courses: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Enrollment Status Indicator */}
                     {isEnrolled(course.id) && (
                       <div className="mb-3">
                         <div className="flex items-center space-x-1 text-green-600 text-sm">
@@ -368,8 +270,7 @@ const Courses: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Action Button */}
-                    <button
+                    <Button
                       onClick={() => handleEnroll(course.id, course.title)}
                       disabled={isEnrolled(course.id)}
                       className={`w-full py-2.5 px-4 rounded-lg font-medium transition-all duration-200 ${
@@ -393,14 +294,13 @@ const Courses: React.FC = () => {
                           <span>Enroll Now</span>
                         </span>
                       )}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))
             )}
           </div>
 
-          {/* Loading More Indicator */}
           {isFetchingNextPage && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
               {Array.from({ length: 4 }).map((_, index) => (
@@ -409,10 +309,8 @@ const Courses: React.FC = () => {
             </div>
           )}
 
-          {/* Infinite Scroll Trigger */}
           <div ref={ref} className="h-10 mt-8" />
 
-          {/* No More Courses Message */}
           {!hasNextPage && filteredCourses.length > 0 && (
             <div className="text-center py-8">
               <p className="text-gray-500">You've reached the end of the courses</p>

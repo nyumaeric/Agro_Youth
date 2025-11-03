@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import db from "@/server/db";
-import { enrollments } from "@/server/db/schema";
+import { course, enrollments } from "@/server/db/schema";
 import { getUserIdFromSession } from "@/utils/getUserIdFromSession";
 import { sendResponse } from "@/utils/response";
 import { eq } from "drizzle-orm";
@@ -13,9 +13,17 @@ export const GET = async (req: NextRequest) => {
     }
 
     const userEnrollments = await db
-      .select()
-      .from(enrollments)
-      .where(eq(enrollments.userId, userId));
+    .select({
+      id: enrollments.id,
+      userId: enrollments.userId,
+      courseId: enrollments.courseId,
+      enrolledAt: enrollments.enrolledAt,
+      isCompleted: course.isCourseCompleted
+    })
+    .from(enrollments)
+    .leftJoin(course, eq(enrollments.courseId, course.id))
+    .where(eq(enrollments.userId, userId))
+    .orderBy(enrollments.enrolledAt);
 
     return sendResponse(200, userEnrollments, "Enrollments fetched successfully");
   } catch (error) {

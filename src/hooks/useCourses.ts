@@ -1,6 +1,6 @@
 'use client';
 
-import { getSingleCourse, getSingleCourseModule } from '@/services/getCourse';
+import { getCertificate, getSingleCourse, getSingleCourseModule, postCertificate } from '@/services/getCourse';
 import showToast from '@/utils/showToast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -24,12 +24,26 @@ export interface Course {
   level: string;
   category: string;
   language: string;
+  isCourseCompleted: boolean;
   moduleCount: number;
   createdAt: string;
   updatedAt: string;
   modules: Module[];
 }
-
+export interface Certificate {
+  id: string;
+  courseId: string;
+  courseTitle: string;
+  courseDescription: string;
+  courseLevel: string;
+  courseCategory: string;
+  courseLanguage: string;
+  timeToComplete: string;
+  courseInstructorFullName: string;
+  completionMessage: string;
+  completedAt: string;
+  createdAt: string;
+}
 interface ApiResponse {
   status: string;
   message: string;
@@ -53,7 +67,6 @@ export const useCourseModule = (courseId: string, moduleId: string) => {
     });
 };
 
-// Fixed hook - removed premature optimistic update for enrollments
 export const useEnrolledCourses = (userId: string) => {
   const queryClient = useQueryClient();
   
@@ -87,7 +100,6 @@ export const useEnrolledCourses = (userId: string) => {
         };
       });
       
-      // Invalidate to get fresh data from server
       queryClient.invalidateQueries({ queryKey: ["enrollments", userId] });
     },
     
@@ -128,3 +140,28 @@ export const useUnenrollCourse = (userId: string) => {
   };
 };
 
+export const useCertificate = (courseId: string) => {
+  return useQuery({
+    queryKey: ["certificate", courseId],
+    queryFn: () => getCertificate(courseId),
+    retry: false,
+    enabled: !!courseId,
+  });
+};
+
+export const useClaimCertificate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (courseId: string) => postCertificate(courseId),
+    onSuccess: (data, courseId) => {
+      showToast("Certificate claimed successfully!", "success");
+      queryClient.invalidateQueries({ queryKey: ["certificate"] });
+      queryClient.invalidateQueries({ queryKey: ["course", courseId] });
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || "Failed to claim certificate";
+      showToast(message, "error");
+    },
+  });
+};

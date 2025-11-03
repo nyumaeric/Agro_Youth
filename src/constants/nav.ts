@@ -1,5 +1,6 @@
 export const NAVIGATION_LINKS = [
-    { path: '/', label: 'home', icon: '📚' },
-    { path: '/courses', label: 'Courses', icon: '📚' },
-    { path: '/market', label: 'Market', icon: '🛒' },
+    { path: '/', label: 'home'},
+    { path: '/courses', label: 'Courses' },
+    { path: '/market', label: 'Market'},
+    { path: '/investors', label: 'Apply Donation'},
   ] as const;

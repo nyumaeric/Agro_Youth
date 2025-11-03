@@ -18,6 +18,19 @@ export async function getUserIdFromSession(): Promise<string | null> {
     return null;
   }
 }
+export async function getUserTypeFromSession(): Promise<string | null> {
+  try {
+    const session = await getServerSession(options);
+    console.log("session", session);
+    if (!session || !session.user?.userType) {
+      return null;
+    }
+
+    return session.user.userType;
+  } catch (error) {
+    return null;
+  }
+}
 
 async function getUserRoleWithId(): Promise<{ userId: string; role: string } | null> {
   const userId = await getUserIdFromSession();

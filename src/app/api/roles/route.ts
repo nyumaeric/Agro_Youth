@@ -49,6 +49,10 @@ export const POST = async(req: NextRequest) => {
 export const GET = async(req: NextRequest) => {
     void req;
     try {
+        const isAdmin = await checkIfUserIsAdmin();
+        if(!isAdmin){
+            return sendResponse(400, null, "Unauthorized")
+        }
         const allRoles = await db.select().from(roles);
         if(allRoles.length === 0){
             return sendResponse(404, null, "No roles found");

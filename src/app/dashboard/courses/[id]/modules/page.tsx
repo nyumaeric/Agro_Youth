@@ -1,22 +1,30 @@
 "use client";
+import Certificate from "@/app/components/Certificate";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Course, useCourse } from "@/hooks/useCourses";
+import { Course, useCertificate, useClaimCertificate, useCourse } from "@/hooks/useCourses";
+import {Award, Loader, Verified } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
-import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal, useState } from "react";
 
 export default function CoursePage() {
-    const router = useRouter();
     const params = useParams();
     const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
     const { data, isPending, isError } = useCourse(courseId!);
+    const { data: certificateData } = useCertificate(courseId!);
+    const userName = certificateData?.data?.userName
+    const router = useRouter();
+
+
+    const { mutate: claimCertificate, isPending: isClaimingCertificate } = useClaimCertificate();
+    const [showCertificate, setShowCertificate] = useState(false);
     
     if (isPending) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                    <Loader className="animate-spin rounded-full h-12 w-12 mx-auto mb-4"/>
                     <p className="text-gray-600">Loading course...</p>
                 </div>
             </div>
@@ -49,10 +57,34 @@ export default function CoursePage() {
         );
     }
 
+    const hasCertificate = certificateData?.data;
+    const canClaimCertificate = course.isCourseCompleted && !hasCertificate;
+
+    const handleClaimCertificate = () => {
+        claimCertificate(courseId as string, {
+            onSuccess: () => {
+                setShowCertificate(true);
+            }
+        });
+    };
+
+    const handleViewCertificate = () => {
+        setShowCertificate(true);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-6xl mx-auto px-4">
-                {/* Course Header */}
+                {showCertificate && hasCertificate && (
+                    <Certificate
+                        certificate={hasCertificate}
+                        onClose={() => setShowCertificate(false)}
+                        userName={userName}
+                    />
+                )}
+                <div className="mb-6 cursor-pointer">
+                    <Button onClick={() => router.push(`/dashboard/courses/${courseId}/posts`)} className="bg-slate-900 py-2 px-4">Start Discussion</Button>
+                </div>
                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-8">
                     <div className="p-8 border-b border-gray-200">
                         <div className="flex items-center gap-2 mb-4">
@@ -63,8 +95,37 @@ export default function CoursePage() {
                                 {course.category}
                             </span>
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-3">{course.title}</h1>
-                        <p className="text-gray-600 leading-relaxed">{course.description}</p>
+                        <div className="flex items-center gap-2 mb-3">
+                            <h1 className="text-3xl font-bold text-gray-900">{course.title}</h1>
+                            {course.isCourseCompleted && (
+                                <Verified className="w-8 h-8 text-white fill-blue-600 flex-shrink-0" />
+                            )}
+                        </div>
+
+                        <p className="text-gray-600 leading-relaxed mb-6">{course.description}</p>
+
+                        {course.isCourseCompleted && (
+                            <div className="flex flex-wrap gap-3">
+                                {canClaimCertificate ? (
+                                    <Button
+                                        onClick={handleClaimCertificate}
+                                        disabled={isClaimingCertificate}
+                                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <Award className="w-5 h-5" />
+                                        {isClaimingCertificate ? "Claiming..." : "Claim Your Certificate"}
+                                    </Button>
+                                ) : hasCertificate && (
+                                    <button
+                                        onClick={handleViewCertificate}
+                                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg"
+                                    >
+                                        <Award className="w-5 h-5" />
+                                        View Certificate
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="p-8">
@@ -93,9 +154,9 @@ export default function CoursePage() {
                                 Course Content
                             </h2>
                             {course.modules && course.modules.length > 0 && (
-                                <span className="text-sm text-gray-500">
+                                <Badge className="text-sm text-white bg-gray-500 px-3 py-2">
                                     {course.modules.filter((m: { isCompleted: boolean; }) => m.isCompleted).length} of {course.modules.length} completed
-                                </span>
+                                </Badge>
                             )}
                         </div>
                     </div>
@@ -134,11 +195,11 @@ export default function CoursePage() {
                                                     <span>{module.durationTime}</span>
                                                 </div>
                                                 {module.isCompleted && (
-                                                    <div className="flex items-center gap-1.5 text-gray-700">
+                                                    <div className="flex items-center gap-1.5 text-green-500">
                                                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                                         </svg>
-                                                        <span className="font-medium">Completed</span>
+                                                        <Badge className="font-medium bg-green-400">Completed</Badge>
                                                     </div>
                                                 )}
                                             </div>
@@ -152,8 +213,6 @@ export default function CoursePage() {
                                         >
                                             {module.isCompleted ? 'Review' : 'Start'}
                                         </Link>
-
-                              
                                     </div>
                                 </div>
                             ))

@@ -1,10 +1,60 @@
 import db from "@/server/db";
-import { course, courseModules } from "@/server/db/schema";
+import { course, courseModules, courseProgress } from "@/server/db/schema";
 import { checkIfUserIsAdmin, getUserIdFromSession } from "@/utils/getUserIdFromSession";
 import { sendResponse } from "@/utils/response";
 import { courseModuleValidation } from "@/validator/courseModule";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
+
+
+
+export async function updateCourseProgress(courseId: string, userId: string) {
+  try {
+    const allModules = await db
+      .select()
+      .from(courseModules)
+      .where(eq(courseModules.courseId, courseId));
+
+    const completedCount = allModules.filter(module => module.isCompleted).length;
+    const totalModules = allModules.length;
+
+    const progressPercentage = totalModules > 0 
+      ? Math.round((completedCount / totalModules) * 100) 
+      : 0;
+
+    const [existingProgress] = await db
+      .select()
+      .from(courseProgress)
+      .where(
+        and(
+          eq(courseProgress.courseId, courseId),
+          eq(courseProgress.userId, userId)
+        )
+      );
+
+    if (existingProgress) {
+      await db
+        .update(courseProgress)
+        .set({
+          completedModules: completedCount,
+          progressPercentage,
+          updatedAt: new Date(),
+        })
+        .where(eq(courseProgress.id, existingProgress.id));
+    } else {
+      await db.insert(courseProgress).values({
+        userId,
+        courseId,
+        completedModules: completedCount,
+        progressPercentage,
+      });
+    }
+
+    return { completedCount, totalModules, progressPercentage };
+  } catch (error) {
+    throw error;
+  }
+}
 
 export const POST = async (req:NextRequest, {params}: {params: Promise<{id: string}>}) => {
     try {
@@ -14,7 +64,6 @@ export const POST = async (req:NextRequest, {params}: {params: Promise<{id: stri
       } catch {
         body = {};
       }
-
 
        const { id } = await params;
 
@@ -57,7 +106,7 @@ export const POST = async (req:NextRequest, {params}: {params: Promise<{id: stri
         isCompleted,
         durationTime,
       });
-
+      await updateCourseProgress(id, userId);
 
       return sendResponse(200, null, "Module created successfully");
 
@@ -72,7 +121,7 @@ export const GET = async(req:NextRequest, {params}: {params: Promise<{id: string
     try {
         const { id } = await params;
         const courseModule = await db.select().from(courseModules).where(eq(courseModules.courseId, id)).orderBy(desc(courseModules.createdAt))
-        return sendResponse(200, courseModule, "Module created Successfully")
+        return sendResponse(200, courseModule, "Module received Successfully")
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "An error occurred";
 

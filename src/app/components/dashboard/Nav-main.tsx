@@ -14,6 +14,8 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { JSX, useState } from "react"
 import { ChevronRight } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { getMenuItems } from "@/constants/dashboard"
 
 interface IconProps {
   className?: string;
@@ -36,13 +38,12 @@ interface NavItem {
   items?: SubNavItem[];
 }
 
-export function NavMain({
-  items,
-}: {
-  items: NavItem[]
-}) {
+export function NavMain() {
   const pathname = usePathname()
+  const { data: session } = useSession()
   const [openItems, setOpenItems] = useState<string[]>([])
+
+  const items = getMenuItems(session?.user?.role, session?.user?.userType)
 
   const toggleItem = (title: string) => {
     setOpenItems(prev =>
@@ -54,7 +55,6 @@ export function NavMain({
 
   const isItemOpen = (title: string) => openItems.includes(title)
 
-  // Auto-open parent if child is active
   const isParentActive = (item: NavItem) => {
     if (!item.items) return false
     return item.items.some(subItem => pathname === subItem.href || pathname.startsWith(subItem.href + '/'))
@@ -74,7 +74,7 @@ export function NavMain({
                   "text-white font-semibold text-lg shadow-lg",
                   "hover:shadow-xl hover:scale-[1.02]",
                   "transition-all duration-300 ease-out",
-                  "border border-blue-500/20"
+                  "border border-green-500/20"
                 )}
               >
                 <div className="relative flex items-center justify-center gap-2">
@@ -101,17 +101,17 @@ export function NavMain({
                         onClick={() => toggleItem(item.title)}
                         className={cn(
                           "group relative rounded-lg py-3 px-4 transition-all duration-300 ease-out w-full",
-                          "hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/50",
-                          "hover:shadow-md hover:scale-[1.02] hover:border-blue-200/50",
+                          "hover:bg-gradient-to-r hover:from-gray-50 hover:to-green-50/50",
+                          "hover:shadow-md hover:scale-[1.02] hover:border-green-200/50",
                           "active:scale-[0.98] active:shadow-sm",
                           "border border-transparent cursor-pointer",
                           isParentActive(item) && [
-                            "bg-gradient-to-r from-blue-50 to-indigo-50",
-                            "border-blue-200 shadow-md",
-                            "text-blue-700 font-medium"
+                            "bg-gradient-to-r from-green-50 to-indigo-50",
+                            "border-green-200 shadow-md",
+                            "text-green-700 font-medium"
                           ],
                           !isParentActive(item) && [
-                            "text-gray-700 hover:text-blue-700",
+                            "text-gray-700 hover:text-green-700",
                             "hover:border-gray-200"
                           ]
                         )}
@@ -119,8 +119,8 @@ export function NavMain({
                         <div className="flex items-center gap-3 w-full">
                           <div className={cn(
                             "flex items-center justify-center w-5 h-5 transition-all duration-300",
-                            isParentActive(item) && "text-blue-600 scale-110",
-                            !isParentActive(item) && "text-gray-500 group-hover:text-blue-600 group-hover:scale-110"
+                            isParentActive(item) && "text-green-600 scale-110",
+                            !isParentActive(item) && "text-gray-500 group-hover:text-green-600 group-hover:scale-110"
                           )}>
                             {item.icon && (
                               <item.icon 
@@ -132,7 +132,7 @@ export function NavMain({
 
                           <span className={cn(
                             "transition-all duration-300 tracking-wide",
-                            isParentActive(item) && "font-medium text-blue-800",
+                            isParentActive(item) && "font-medium text-green-800",
                             !isParentActive(item) && "group-hover:translate-x-1"
                           )}>
                             {item.title}
@@ -158,11 +158,11 @@ export function NavMain({
                                   <SidebarMenuSubButton
                                     className={cn(
                                       "rounded-md py-2 px-3 transition-all duration-200 w-full",
-                                      "hover:bg-blue-50 hover:text-blue-700",
+                                      "hover:bg-green-50 hover:text-green-700",
                                       "border border-transparent",
                                       isSubActive && [
-                                        "bg-blue-100 text-blue-800 font-medium",
-                                        "border-blue-200"
+                                        "bg-green-100 text-green-800 font-medium",
+                                        "border-green-200"
                                       ],
                                       !isSubActive && "text-gray-600"
                                     )}
@@ -170,7 +170,7 @@ export function NavMain({
                                     <span className="flex items-center gap-2">
                                       <div className={cn(
                                         "w-1.5 h-1.5 rounded-full transition-all",
-                                        isSubActive ? "bg-blue-600" : "bg-gray-400"
+                                        isSubActive ? "bg-green-600" : "bg-gray-400"
                                       )} />
                                       {subItem.title}
                                     </span>
@@ -188,17 +188,17 @@ export function NavMain({
                         tooltip={item.title}
                         className={cn(
                           "group relative rounded-lg py-3 px-4 transition-all duration-300 ease-out w-full",
-                          "hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/50",
-                          "hover:shadow-md hover:scale-[1.02] hover:border-blue-200/50",
+                          "hover:bg-gradient-to-r hover:from-gray-50 hover:to-green-50/50",
+                          "hover:shadow-md hover:scale-[1.02] hover:border-green-200/50",
                           "active:scale-[0.98] active:shadow-sm",
                           "border border-transparent cursor-pointer",
                           isActive && [
-                            "bg-gradient-to-r from-blue-50 to-indigo-50",
-                            "border-blue-200 shadow-md",
-                            "text-blue-700 font-medium"
+                            "bg-gradient-to-r from-green-50 to-indigo-50",
+                            "border-green-200 shadow-md",
+                            "text-green-700 font-medium"
                           ],
                           !isActive && [
-                            "text-gray-700 hover:text-blue-700",
+                            "text-gray-700 hover:text-green-700",
                             "hover:border-gray-200"
                           ]
                         )}
@@ -206,8 +206,8 @@ export function NavMain({
                         <div className="flex items-center gap-3 w-full">
                           <div className={cn(
                             "flex items-center justify-center w-5 h-5 transition-all duration-300",
-                            isActive && "text-blue-600 scale-110",
-                            !isActive && "text-gray-500 group-hover:text-blue-600 group-hover:scale-110"
+                            isActive && "text-green-600 scale-110",
+                            !isActive && "text-gray-500 group-hover:text-green-600 group-hover:scale-110"
                           )}>
                             {item.icon && (
                               <item.icon 
@@ -219,7 +219,7 @@ export function NavMain({
 
                           <span className={cn(
                             "transition-all duration-300 tracking-wide",
-                            isActive && "font-medium text-blue-800",
+                            isActive && "font-medium text-green-800",
                             !isActive && "group-hover:translate-x-1"
                           )}>
                             {item.title}
@@ -227,12 +227,12 @@ export function NavMain({
 
                           {isActive && (
                             <div className="ml-auto flex items-center">
-                              <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" />
+                              <div className="w-1.5 h-1.5 bg-green-600 rounded-full animate-pulse" />
                             </div>
                           )}
 
                           <div className={cn(
-                            "ml-auto w-0 h-0.5 bg-blue-500 rounded-full transition-all duration-300",
+                            "ml-auto w-0 h-0.5 bg-green-500 rounded-full transition-all duration-300",
                             "group-hover:w-6",
                             isActive && "w-0"
                           )} />
@@ -242,7 +242,7 @@ export function NavMain({
                   )}
 
                   {isActive && !hasSubItems && (
-                    <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50" />
+                    <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent opacity-50" />
                   )}
                 </SidebarMenuItem>
               )

@@ -7,18 +7,13 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
-// Helper function to check if a string is likely an ID
 const isLikelyId = (segment: string): boolean => {
-  // Check for MongoDB ObjectId (24 hex characters)
   if (/^[a-f0-9]{24}$/i.test(segment)) return true;
   
-  // Check for UUID format
   if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment)) return true;
   
-  // Check for numeric IDs
   if (/^\d+$/.test(segment)) return true;
   
-  // Check for short alphanumeric IDs (common in many systems)
   if (/^[a-z0-9_-]{8,}$/i.test(segment) && !/[a-z]{3,}/i.test(segment)) return true;
   
   return false;
@@ -39,7 +34,6 @@ const generateBreadcrumbs = (pathname: string) => {
   segments.forEach((segment, index) => {
     currentPath += `/${segment}`;
     
-    // Skip IDs in breadcrumbs
     if (isLikelyId(segment)) {
       return;
     }
@@ -63,7 +57,6 @@ export function TopSide() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
-  // const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const getNotificationIcon = (type: string) => {
     const baseClasses = "w-3 h-3 rounded-full flex-shrink-0";

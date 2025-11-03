@@ -103,6 +103,7 @@ export const GET = async (req: NextRequest) => {
       timeToComplete: course.timeToComplete,
       level: course.level,
       category: course.category,
+      isCompleted: course.isCourseCompleted,
       language: course.language,
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,

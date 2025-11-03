@@ -29,10 +29,8 @@ export const useAddUsers = () => {
       setErrors({});
       showToast(response.message, "success");
       
-      // Show popup immediately
       setShowVerificationPopup(true);
       
-      // Redirect to login after 3 seconds
       setTimeout(() => {
         router.push("/login");
       }, 3000);
@@ -51,7 +49,6 @@ export const useAddUsers = () => {
     
     setFormData(prev => ({ ...prev, [fieldName]: value }));
     
-    // Clear error for this field
     if (errors[fieldName]) {
       setErrors(prev => {
         const { [fieldName]: _, ...rest } = prev;
@@ -63,7 +60,6 @@ export const useAddUsers = () => {
   const handleRadioChange = (value: "farmer" | "buyer") => {
     setFormData(prev => ({ ...prev, user_type: value }));
     
-    // Clear error for user_type field
     if (errors.user_type) {
       setErrors(prev => {
         const { user_type: _, ...rest } = prev;
@@ -75,7 +71,11 @@ export const useAddUsers = () => {
   const handleSubmit = () => {
     try {
       registerSchema.parse(formData);
-      mutate(formData);
+      const userToRegister = {
+        ...formData,
+        userType: formData.user_type,
+      };
+      mutate(userToRegister);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const fieldErrors = error.issues.reduce(
@@ -88,7 +88,6 @@ export const useAddUsers = () => {
         );
         setErrors(fieldErrors);
         
-        // Show first error in toast
         const firstError = Object.values(fieldErrors)[0];
         if (firstError) {
           showToast(firstError, "error");

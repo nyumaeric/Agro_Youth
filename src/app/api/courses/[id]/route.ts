@@ -2,12 +2,12 @@ import db from "@/server/db";
 import { course, courseModules } from "@/server/db/schema";
 import { sendResponse } from "@/utils/response";
 import { eq, sql } from "drizzle-orm";
+import { NextRequest } from "next/server";
 
-export const GET = async (request: Request, { params }: { params: Promise<{ id: string }> }) => {
+export const GET = async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     try {
         const { id } = await params;
         
-        // Get course with module count
         const [courseData] = await db
           .select({
             id: course.id,
@@ -18,6 +18,7 @@ export const GET = async (request: Request, { params }: { params: Promise<{ id: 
             level: course.level,
             category: course.category,
             language: course.language,
+            isCourseCompleted: course.isCourseCompleted,
             createdAt: course.createdAt,
             updatedAt: course.updatedAt,
             moduleCount: sql<number>`COUNT(${courseModules.id})::int`.as('module_count')
@@ -31,7 +32,6 @@ export const GET = async (request: Request, { params }: { params: Promise<{ id: 
           return sendResponse(404, null, "Course not found");
         }
 
-        // Get all modules for this course
         const modules = await db
           .select({
             id: courseModules.id,
@@ -46,7 +46,6 @@ export const GET = async (request: Request, { params }: { params: Promise<{ id: 
           .where(eq(courseModules.courseId, id))
           .orderBy(courseModules.createdAt);
 
-        // Combine course data with modules
         const response = {
           ...courseData,
           modules
@@ -59,3 +58,4 @@ export const GET = async (request: Request, { params }: { params: Promise<{ id: 
         return sendResponse(500, null, errorMessage); 
     }
 }
+

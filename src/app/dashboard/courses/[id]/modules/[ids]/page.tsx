@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useCourseModule, useCourse } from "@/hooks/useCourses";
 import { useUpdateModules } from "@/hooks/useModules";
+import { Loader, Loader2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 
 export default function ModulePage() {
@@ -9,16 +10,27 @@ export default function ModulePage() {
     const params = useParams();
     const courseId = Array.isArray(params.id) ? params.id[0] : params.id;
     const moduleId = Array.isArray(params.ids) ? params.ids[0] : params.ids;
-    
-    const { data, isPending, isError } = useCourseModule(courseId!, moduleId!);
-    const { data: courseData } = useCourse(courseId!);
+  
+
+    if (typeof courseId !== "string" || typeof moduleId !== "string") {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <div className="text-center">
+                    <p className="text-red-600 mb-4">Invalid course or module ID</p>
+                </div>
+            </div>
+        );
+    }
+
+    const { data, isPending, isError } = useCourseModule(courseId, moduleId);
+    const { data: courseData } = useCourse(courseId);
     const { mutate: updateModule, isPending: isUpdating } = useUpdateModules();
     
     if (isPending) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                    <Loader className="animate-spin rounded-full h-12 w-12 mx-auto mb-4"/>
                     <p className="text-gray-600">Loading module...</p>
                 </div>
             </div>
@@ -31,7 +43,7 @@ export default function ModulePage() {
                 <div className="text-center">
                     <p className="text-red-600 mb-4">Error loading module</p>
                     <Button 
-                        onClick={() => router.push(`/dashboard/courses/${courseId}`)}
+                        onClick={() => router.push(`/dashboard/courses/${courseId}/modules`)}
                         variant="outline"
                     >
                         Back to Course
@@ -43,16 +55,16 @@ export default function ModulePage() {
 
     const module = data.data;
     const modules = courseData?.data?.modules || [];
-    const currentModuleIndex = modules.findIndex((m: any) => m.id === moduleId);
+    const currentModuleIndex = modules.findIndex((m) => m.id === moduleId);
     const nextModule = modules[currentModuleIndex + 1];
     const hasNextModule = currentModuleIndex !== -1 && nextModule;
 
-    const handleMarkAsComplete = () => {
+    const handleToggleComplete = () => {
         updateModule({
-            id: courseId!,
-            ids: moduleId!,
+            id: courseId,
+            ids: moduleId,
             data: {
-                isCompleted: true,
+                isCompleted: !module.isCompleted,
             }
         });
     };
@@ -61,7 +73,7 @@ export default function ModulePage() {
         if (hasNextModule) {
             router.push(`/dashboard/courses/${courseId}/modules/${nextModule.id}`);
         } else {
-            router.push(`/dashboard/courses/${courseId}`);
+            router.push(`/dashboard/courses/${courseId}/modules`);
         }
     };
 
@@ -69,7 +81,7 @@ export default function ModulePage() {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-6xl mx-auto px-4">
                 <Button
-                    onClick={() => router.push(`/dashboard/courses/${courseId}`)}
+                    onClick={() => router.push(`/dashboard/courses/${courseId}/modules`)}
                     variant="ghost"
                     className="mb-6"
                 >
@@ -121,21 +133,32 @@ export default function ModulePage() {
                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                     <div className="p-6 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            {!module.isCompleted ? (
+                            {isUpdating ? (
                                 <Button 
-                                    className="bg-gray-900 hover:bg-gray-800 text-white"
-                                    onClick={handleMarkAsComplete}
-                                    disabled={isUpdating}
+                                    className="bg-gray-900 text-white cursor-pointer"
+                                    disabled
                                 >
-                                    {isUpdating ? "Updating..." : "Mark as Complete"}
+                                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                                    Updating...
                                 </Button>
-                            ) : (
-                                <div className="flex items-center gap-2 text-green-700">
-                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            ) : module.isCompleted ? (
+                                <Button
+                                    variant="outline"
+                                    className="border-green-200 bg-green-50 text-green-700 hover:bg-green-100"
+                                    onClick={handleToggleComplete}
+                                >
+                                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                     </svg>
-                                    <span className="font-medium">Module Completed</span>
-                                </div>
+                                    Mark as Incomplete
+                                </Button>
+                            ) : (
+                                <Button 
+                                    className="bg-gray-900 hover:bg-gray-800 text-white"
+                                    onClick={handleToggleComplete}
+                                >
+                                    Mark as Complete
+                                </Button>
                             )}
                         </div>
                         

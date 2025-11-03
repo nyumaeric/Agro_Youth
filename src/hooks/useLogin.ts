@@ -18,7 +18,6 @@ export const useLogin = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
 
-  // Redirect if already logged in
   useEffect(() => {
     if (status === 'authenticated' && session) {
       router.push('/dashboard');
@@ -31,7 +30,6 @@ export const useLogin = () => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
     
-    // Clear error for this field
     if (errors[id]) {
       setErrors((prevErrors) => {
         const { [id]: _, ...rest } = prevErrors;
@@ -42,12 +40,10 @@ export const useLogin = () => {
 
   const handleSubmission = async () => {
     try {
-      // Validate form data
       loginSchema.parse(formData);
       setIsLoading(true);
       setErrors({});
 
-      // Attempt sign in with phone number
       const result = await signIn("credentials", {
         redirect: false,
         phoneNumber: formData.phoneNumber,
@@ -57,7 +53,6 @@ export const useLogin = () => {
       setIsLoading(false);
 
       if (result?.error) {
-        // Handle errors
         setErrors({ general: result.error });
         
         if (result?.error === "AccessDenied") {
@@ -68,23 +63,19 @@ export const useLogin = () => {
           showToast("Invalid credentials", "error");
         }
       } else if (result?.ok) {
-        // Success
         showToast("Successfully logged in", "success");
         
-        // Reset form
         setFormData(initialData);
         
-        // Redirect to dashboard after successful login
         setTimeout(() => {
           router.push('/dashboard');
-          router.refresh(); // Refresh to update session
+          router.refresh(); 
         }, 500);
       }
     } catch (error) {
       setIsLoading(false);
       
       if (error instanceof z.ZodError) {
-        // Handle validation errors
         const fieldErrors = error.issues.reduce(
           (acc: Record<string, string>, curr) => {
             const field = Array.isArray(curr.path) && curr.path.length > 0 
@@ -97,13 +88,11 @@ export const useLogin = () => {
         );
         setErrors(fieldErrors);
         
-        // Show first validation error
         const firstError = Object.values(fieldErrors)[0];
         if (firstError) {
           showToast(firstError, "error");
         }
       } else {
-        // Handle unexpected errors
         const errorMessage = "An unexpected error occurred. Please try again.";
         setErrors({ general: errorMessage });
         showToast(errorMessage, "error");

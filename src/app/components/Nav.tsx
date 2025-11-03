@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { NAVIGATION_LINKS } from '@/constants/nav';
-
-
+import { Menu, X, LogOut, User } from 'lucide-react';
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -26,136 +25,132 @@ const Header: React.FC = () => {
   const isActivePage = (path: string) => pathname === path;
 
   return (
-    <header className="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50 backdrop-blur-sm bg-opacity-95">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="flex justify-between items-center py-4">
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 backdrop-blur-md bg-white/95">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2 group"
+            className="flex items-center gap-2 group"
           >
-            <span className="text-3xl transform group-hover:scale-110 transition-transform duration-200">🌾</span>
-            <span className="text-2xl font-bold bg-gradient-to-r from-green-600 via-green-700 to-emerald-600 bg-clip-text text-transparent group-hover:from-green-700 group-hover:to-emerald-700 transition-all duration-200">
+            <span className="text-2xl transition-transform group-hover:scale-110">🌾</span>
+            <span className="text-xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors">
               AgroYouth
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex items-center gap-1">
             {NAVIGATION_LINKS.map((link) => (
               <Link
                 key={link.path}
                 href={link.path}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActivePage(link.path)
-                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <span className="text-lg">{link.icon}</span>
-                <span>{link.label}</span>
+                {link.label}
               </Link>
             ))}
-            
+          </div>
+
+          {/* Desktop Auth Section */}
+          <div className="hidden md:flex items-center gap-3">
             {token ? (
-              <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
-                <div className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
-                  <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-md">
-                    <span className="text-white text-sm">👤</span>
+              <>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="w-7 h-7 bg-gray-900 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">Welcome!</span>
+                  <span className="text-sm font-medium text-gray-700">Account</span>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-sm"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
                 >
+                  <LogOut className="w-4 h-4" />
                   Logout
                 </button>
-              </div>
+              </>
             ) : (
-              <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
+              <>
                 <Link href="/login">
-                  <button className="px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium text-sm">
-                    Login
+                  <button className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
+                    Sign In
                   </button>
                 </Link>
                 <Link href="/register">
-                  <button className="px-5 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                  <button className="px-5 py-2 text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 rounded-lg transition-all shadow-sm">
                     Get Started
                   </button>
                 </Link>
-              </div>
+              </>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Toggle menu"
           >
-            <svg
-              className="w-6 h-6 text-gray-700"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6 text-gray-700" />
+            ) : (
+              <Menu className="w-6 h-6 text-gray-700" />
+            )}
           </button>
         </nav>
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100 animate-fade-in">
-            <div className="flex flex-col space-y-2">
+          <div className="md:hidden border-t border-gray-200 py-4">
+            <div className="flex flex-col gap-1">
               {NAVIGATION_LINKS.map((link) => (
                 <Link
                   key={link.path}
                   href={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                     isActivePage(link.path)
-                      ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-gray-900 text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <span className="text-xl">{link.icon}</span>
-                  <span className="font-medium">{link.label}</span>
+                  {link.label}
                 </Link>
               ))}
               
-              <div className="border-t border-gray-100 pt-4 mt-2">
+              <div className="border-t border-gray-200 mt-4 pt-4">
                 {token ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
-                      <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-md">
-                        <span className="text-white">👤</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="w-9 h-9 bg-gray-900 rounded-full flex items-center justify-center">
+                        <User className="w-5 h-5 text-white" />
                       </div>
-                      <span className="font-medium text-gray-700">Welcome!</span>
+                      <span className="text-sm font-medium text-gray-700">My Account</span>
                     </div>
                     <button
                       onClick={() => {
                         handleLogout();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-all border border-gray-200"
                     >
+                      <LogOut className="w-4 h-4" />
                       Logout
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                      <button className="w-full px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium border border-gray-200">
-                        Login
+                      <button className="w-full px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-all border border-gray-200">
+                        Sign In
                       </button>
                     </Link>
                     <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                      <button className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium shadow-md">
+                      <button className="w-full px-4 py-3 text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 rounded-lg transition-all shadow-sm">
                         Get Started
                       </button>
                     </Link>

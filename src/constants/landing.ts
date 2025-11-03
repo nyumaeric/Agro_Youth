@@ -17,12 +17,11 @@ export const FEATURES = [
       icon: '🤝',
       title: 'Community Support',
       description: 'Join a growing digital community of young farmers and mentors. Share ideas, access expert guidance, and grow your farming career together.',
-      link: '/courses', // Will be dynamic based on token
+      link: '/courses',
       stats: '2500+ Active AgroYouth Members'
     }
   ];
   
-  // Stats constant
 export const STATS = [
     { number: '2,500+', label: 'Young Farmers Empowered' },
     { number: '500+', label: 'Digital Learning Resources' },

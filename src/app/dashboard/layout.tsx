@@ -8,6 +8,7 @@ import {
 import { AppSidebar } from "../components/dashboard/App-sidebar";
 import { TopSide } from "../components/dashboard/TopSide";
 import { Provider } from "@/utils/Provider";
+import { Toaster } from "react-hot-toast";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,32 @@ export default function RootLayout({
           <DashboardContent>
             {children}
           </DashboardContent>
+          <Toaster 
+            position="top-center"
+            reverseOrder={false}
+            gutter={8}
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#fff',
+                color: '#363636',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
         </QueryClientProvider>
       </body>
     </html>

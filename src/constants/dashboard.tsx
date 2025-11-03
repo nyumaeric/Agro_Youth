@@ -1,12 +1,12 @@
 import {
   BookOpen,
-  GraduationCap,
   ShoppingBag,
   Award,
   User,
   Home,
   LucideIcon,
-  ChevronRight
+  Group,
+  Users
 } from "lucide-react";
 import { JSX } from "react";
 
@@ -46,47 +46,192 @@ interface MenuItems {
   navMain: NavItem[];
 }
 
-export const menuItems: MenuItems = {
-  user: {
-    name: "Ruth Uwamahoro",
-    email: "ruthuwamahoro250@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
+export const adminMenuItems: NavItem[] = [
+  {
+    title: "Overview",
+    href: "/dashboard",
+    icon: createIcon(Home)
   },
-  navMain: [
-    {
-      title: "Overview",
-      href: "/dashboard",
-      icon: createIcon(Home)
+  {
+    title: "Courses",
+    href: "/dashboard/courses",
+    icon: createIcon(BookOpen),
+    items: [
+      {
+        title: "My Courses",
+        href: "/dashboard/courses"
+      }
+    ]
+  },
+  {
+    title: "Products",
+    href: "/dashboard/products",
+    icon: createIcon(ShoppingBag)
+  },
+  {
+    title: "Live Sessions",
+    href: "/dashboard/livesessions",
+    icon: createIcon(Group)
+  },
+  {
+    title: "Users",
+    href: "/dashboard/users",
+    icon: createIcon(Users),
+    items: [
+      {
+        title: "All Users",
+        href: "/dashboard/users"
+      },
+      {
+        title: "roles",
+        href: "/dashboard/roles"
+      }
+    ]
+  },
+  {
+    title: "Profile",
+    href: "/dashboard/profile",
+    icon: createIcon(User)
+  }
+];
+
+export const investorMenuItems: NavItem[] = [
+  {
+    title: "Overview",
+    href: "/dashboard",
+    icon: createIcon(Home)
+  },
+  {
+    title: "Courses",
+    href: "/dashboard/courses",
+    icon: createIcon(BookOpen),
+    items: [
+      {
+        title: "All Courses",
+        href: "/dashboard/courses"
+      },
+      {
+        title: "Enrolled Courses",
+        href: "/dashboard/courses/enrolled"
+      }
+    ]
+  },
+  {
+    title: "Certificates",
+    href: "/dashboard/certificates",
+    icon: createIcon(Award)
+  },
+  {
+    title: "Products",
+    href: "/dashboard/products",
+    icon: createIcon(ShoppingBag)
+  },
+  {
+    title: "Live Sessions",
+    href: "/dashboard/livesessions",
+    icon: createIcon(Group)
+  },
+  {
+    title: "Review the Application",
+    href: "/dashboard/investor/review-applications",
+    icon: createIcon(Group)
+  },
+  {
+    title: "Profile",
+    href: "/dashboard/profile",
+    icon: createIcon(User)
+  }
+];
+
+export const farmerMenuItems: NavItem[] = [
+  {
+    title: "Overview",
+    href: "/dashboard",
+    icon: createIcon(Home)
+  },
+  {
+    title: "Courses",
+    href: "/dashboard/courses",
+    icon: createIcon(BookOpen),
+    items: [
+      {
+        title: "All Courses",
+        href: "/dashboard/courses"
+      },
+      {
+        title: "Enrolled Courses",
+        href: "/dashboard/courses/enrolled"
+      }
+    ]
+  },
+  {
+    title: "Products",
+    href: "/dashboard/products",
+    icon: createIcon(ShoppingBag)
+  },
+  {
+    title: "Certificates",
+    href: "/dashboard/certificates",
+    icon: createIcon(Award)
+  },
+  {
+    title: "Live Sessions",
+    href: "/dashboard/livesessions",
+    icon: createIcon(Group)
+  },
+  {
+    title: "Donation",
+    href: "/dashboard/apply",
+    icon: createIcon(BookOpen),
+    items: [
+      {
+        title: "Apply",
+        href: "/dashboard/apply"
+      },
+      {
+        title: "All Applications",
+        href: "/dashboard/allapplications"
+      }
+    ]
+  },
+  {
+    title: "Profile",
+    href: "/dashboard/profile",
+    icon: createIcon(User)
+  }
+];
+
+export const getMenuItems = (role?: string, userType?: string): NavItem[] => {
+  console.log("🔍 Checking user permissions:", { role, userType });
+  
+  if (role && (role.toLowerCase() === "admin" || role === "ADMIN")) {
+    return adminMenuItems;
+  }
+  
+  if (userType && userType.toLowerCase() === "investor") {
+    return investorMenuItems;
+  }
+  
+  if (userType && userType.toLowerCase() === "farmer") {
+    return farmerMenuItems;
+  }
+  
+  return farmerMenuItems;
+};
+
+export const createMenuItems = (user: {
+  name: string;
+  email: string;
+  avatar: string;
+  role?: string;
+  userType?: string;
+}): MenuItems => {
+  return {
+    user: {
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
     },
-    {
-      title: "Courses",
-      href: "/dashboard/courses",
-      icon: createIcon(BookOpen),
-      items: [
-        {
-          title: "All Courses",
-          href: "/dashboard/courses"
-        },
-        {
-          title: "Enrolled Courses",
-          href: "/dashboard/courses/enrolled"
-        }
-      ]
-    },
-    {
-      title: "Products",
-      href: "/dashboard/products",
-      icon: createIcon(ShoppingBag)
-    },
-    {
-      title: "Certificates",
-      href: "/dashboard/certificates",
-      icon: createIcon(Award)
-    },
-    {
-      title: "Profile",
-      href: "/dashboard/profile",
-      icon: createIcon(User)
-    }
-  ],
+    navMain: getMenuItems(user.role, user.userType),
+  };
 };

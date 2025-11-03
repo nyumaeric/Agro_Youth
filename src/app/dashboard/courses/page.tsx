@@ -65,7 +65,6 @@ const Courses: React.FC = () => {
     language: ''
   });
   
-  // Track individual course enrollment states
   const [enrollingId, setEnrollingId] = useState<string | null>(null);
   const [unenrollingId, setUnenrollingId] = useState<string | null>(null);
   
@@ -178,13 +177,12 @@ const Courses: React.FC = () => {
     return {
       ...course,
       isEnrolled: enrolledCourseIds.has(course.id),
-      completionPercentage: enrollmentData?.completionPercentage || 0,
-      completedModules: enrollmentData?.completedModules || 0,
-      totalModules: enrollmentData?.totalModules || course.moduleCount
+      // completionPercentage: enrollmentData?.completionPercentage || 0,
+      // completedModules: enrollmentData?.completedModules || 0,
+      // totalModules: enrollmentData?.totalModules || course.moduleCount
     };
   });
 
-  // Apply filters
   const filteredCourses = allCourses.filter(course => {
     if (filter.category && course.category !== filter.category) return false;
     if (filter.level && course.level !== filter.level) return false;
@@ -193,29 +191,10 @@ const Courses: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-green-800 mb-4">
-            Agricultural Courses
-          </h1>
-          <p className="text-xl text-green-600 max-w-3xl mx-auto">
-            Enhance your farming skills with our comprehensive courses and earn certificates upon completion
-          </p>
-        </div>
-
-        {/* All Courses Section */}
         <div>
           <Card className="mb-10 border-2 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-3xl font-bold text-green-800">Browse All Courses</CardTitle>
-                <Badge variant="outline" className="text-lg px-4 py-2 font-semibold border-2 border-green-600 text-green-700">
-                  {filteredCourses.length} Courses
-                </Badge>
-              </div>
-            </CardHeader>
             <CardContent className="pt-8 pb-6">
               {/* Filters */}
               <div className="flex flex-wrap gap-4">
@@ -243,19 +222,17 @@ const Courses: React.FC = () => {
                     <SelectItem value="Advanced">🎓 Advanced</SelectItem>
                   </SelectContent>
                 </Select>
-
                 <Button
-                  onClick={() => setFilter({ category: '', level: '', language: '' })}
-                  variant="outline"
-                  className="h-12 px-6 bg-green-600 text-white hover:bg-green-700 hover:text-white border-2 border-green-600 font-semibold"
-                >
-                  Clear Filters
+                 onClick={() => setFilter({ category: '', level: '', language: '' })}
+                 variant="outline"
+                 className="bg-green-600 text-white hover:bg-green-700 hover:text-white border-2 border-green-600 font-semibold"
+
+                > Clear Filters
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Courses Grid - 3 columns */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {isLoading ? (
               Array.from({ length: 9 }).map((_, index) => (
@@ -275,27 +252,19 @@ const Courses: React.FC = () => {
                 const isThisCourseUnenrolling = unenrollingId === course.id;
                 
                 return (
-                  <Card key={course.id} className="group hover:shadow-2xl transition-all duration-300 border-2 hover:border-green-400 overflow-hidden relative">
-                    {course.isEnrolled && !isThisCourseEnrolling && (
-                      <div className="absolute top-4 right-4 z-10">
-                        <div className="bg-blue-500 rounded-full p-2 shadow-lg ring-4 ring-white">
-                          <CheckCircle2 className="w-6 h-6 text-white fill-current" />
-                        </div>
-                      </div>
-                    )}
-
-                    <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-600 text-white pb-6">
-                      <div className="flex items-start justify-between mb-3">
-                        <Badge variant="secondary" className="bg-white/95 text-green-800 font-semibold px-3 py-1">
-                          {course.level}
+                  <Card key={course.id} className="group hover:shadow-2xl transition-all duration-300 border-2 hover:border-gray-300 overflow-hidden p-0">
+                    <CardHeader className="bg-gray-400 text-white pb-16 pt-6">
+                    <div className="flex items-start justify-between mb-3">
+                        <Badge variant="secondary" className="bg-white/95 text-green-800 font-semibold">
+                        {course.level}
                         </Badge>
-                        <Badge variant="secondary" className="bg-blue-600 text-white font-semibold px-3 py-1">
-                          {course.timeToComplete}
+                        <Badge variant="secondary" className="bg-blue-600 text-white font-semibold">
+                        {course.timeToComplete}
                         </Badge>
-                      </div>
-                      <Badge variant="secondary" className="bg-white/95 text-green-800 w-fit font-medium px-3 py-1">
-                        📚 {course.category}
-                      </Badge>
+                    </div>
+                    <Badge variant="secondary" className="bg-white/95 text-green-800 w-fit font-medium">
+                        {course.category}
+                    </Badge>
                     </CardHeader>
 
                     <CardContent className="pt-6 px-6 pb-4">
@@ -353,7 +322,7 @@ const Courses: React.FC = () => {
                       ) : (
                         <Button
                           onClick={() => handleEnroll(course.id)}
-                          className="w-full bg-green-600 hover:bg-green-700 font-semibold shadow-md h-11"
+                          className="w-full bg-green-600 hover:bg-green-700 font-semibold shadow-md"
                         >
                           <CheckCircle2 className="w-5 h-5 mr-2" />
                           Enroll Now

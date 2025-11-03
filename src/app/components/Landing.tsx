@@ -3,10 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { FEATURES, STATS } from '@/constants/landing';
-
-
+import { ArrowRight, BookOpen, Users, ShoppingBag, TrendingUp } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
@@ -15,7 +14,6 @@ const LandingPage: React.FC = () => {
     setToken(localStorage.getItem('access_token'));
   }, []);
 
-  // Update features with dynamic link based on token
   const features = FEATURES.map((feature, index) => 
     index === 2 
       ? { ...feature, link: token ? '/courses' : '/register' }
@@ -23,52 +21,82 @@ const LandingPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="bg-linear-to-br from-primary-50 via-white to-secondary-50 section-padding">
-        <div className="container-custom">
+      <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white">
+        {/* Subtle background decoration */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-50 rounded-full blur-3xl opacity-60"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-emerald-50 rounded-full blur-3xl opacity-60"></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 lg:pt-32 lg:pb-32">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="animate-fade-in">
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Welcome to{' '}
-                <span className="text-gradient">AgroYouth</span>
-              </h1>
-              <p className="text-xl lg:text-2xl text-gray-600 mb-4 font-serif">
-                Empowering the Next Generation of Liberian Farmers
-              </p>
-              <p className="text-lg text-gray-500 mb-8 max-w-2xl mx-auto">
-                Learn, connect, and grow with digital agricultural courses designed for youth.
-               Join a vibrant community of young farmers transforming agriculture through technology.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                {token ? (
-                  <>
-                    <Link href="/courses">
-                      <Button  size="lg" className="w-full sm:w-auto">
-                        Explore Courses 📚
-                      </Button>
-                    </Link>
-                    <Link href="/market">
-                      <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                        Browse Market 🛒
-                      </Button>
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/register">
-                      <Button  size="lg" className="w-full sm:w-auto">
-                        Get Started Free
-                      </Button>
-                    </Link>
-                    <Link href="/login">
-                      <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                        Sign In
-                      </Button>
-                    </Link>
-                  </>
-                )}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full mb-8 border border-green-100">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              <span className="text-sm font-medium text-green-700">Empowering Liberian Youth</span>
+            </div>
+
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 tracking-tight">
+              Welcome to{' '}
+              <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                AgroYouth
+              </span>
+            </h1>
+
+            <p className="text-xl lg:text-2xl text-gray-600 mb-6 font-light">
+              The Future of Liberian Agriculture
+            </p>
+
+            <p className="text-lg text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed">
+              Learn modern farming techniques, connect with fellow young farmers, and access markets—all through one comprehensive digital platform.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              {token ? (
+                <>
+                  <Link href="/courses">
+                    <Button size="lg" className="w-full sm:w-auto h-12 px-8 bg-gray-900 hover:bg-gray-800 text-white rounded-lg shadow-lg hover:shadow-xl transition-all">
+                      Explore Courses
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/market">
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 border-2 border-gray-900 text-gray-900 hover:bg-gray-50 rounded-lg">
+                      Browse Market
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/register">
+                    <Button size="lg" className="w-full sm:w-auto h-12 px-8 bg-gray-900 hover:bg-gray-800 text-white rounded-lg shadow-lg hover:shadow-xl transition-all">
+                      Get Started Free
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 border-2 border-gray-900 text-gray-900 hover:bg-gray-50 rounded-lg">
+                      Connect with us
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* Trust indicators */}
+            <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                <span>Interactive Learning</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                <span>Youth Community</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ShoppingBag className="w-4 h-4" />
+                <span>Market Access</span>
               </div>
             </div>
           </div>
@@ -76,15 +104,15 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
-        <div className="container-custom">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+      <section className="py-16 border-y border-gray-100 bg-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {STATS.map((stat, index) => (
-              <div key={index} className="text-center animate-slide-up">
-                <div className="text-3xl lg:text-4xl font-bold text-primary-600 mb-2">
+              <div key={index} className="text-center group">
+                <div className="text-4xl lg:text-5xl font-bold text-green-600 mb-2 group-hover:scale-110 transition-transform">
                   {stat.number}
                 </div>
-                <div className="text-gray-600 text-sm lg:text-base">
+                <div className="text-gray-600 text-sm lg:text-base font-medium">
                   {stat.label}
                 </div>
               </div>
@@ -94,106 +122,83 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="section-padding bg-gray-50 bg-pattern">
-        <div className="container-custom">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Empowering the Next Generation of Liberian Farmers
+      <section className="py-20 lg:py-28 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 lg:mb-20">
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+              Everything You Need to Succeed
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-             Discover digital tools and resources designed to help young Liberian farmers learn modern techniques, access interactive courses, build stronger farming communities, and connect with markets.
+            <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Digital tools and resources designed specifically for young Liberian farmers to learn, grow, and thrive in modern agriculture.
             </p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="text-center hover:shadow-medium transition-shadow duration-300 animate-slide-up group">
-                <Card className="p-8">
-                  <div className="text-6xl mb-6 group-hover:animate-bounce-gentle">
+              <Card key={index} className="border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 group bg-white">
+                <CardContent className="p-8">
+                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300 text-center">
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">
+                  <p className="text-gray-600 mb-6 leading-relaxed text-base">
                     {feature.description}
                   </p>
-                  <div className="text-sm text-primary-600 font-medium mb-6">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-green-700 mb-6 bg-green-50 px-4 py-2 rounded-lg w-fit">
+                    <TrendingUp className="w-4 h-4" />
                     {feature.stats}
                   </div>
                   <Link href={feature.link}>
                     <Button 
-                    //   variant={index === 0 ? 'primary' : 'outline'} 
-                      size="sm" 
-                      className="w-full"
+                      variant="outline"
+                      className="w-full border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors flex items-center justify-center"
                     >
                       Learn More
+                      <ArrowRight className="ml-2 w-4 h-4 flex-shrink-0" />
                     </Button>
                   </Link>
-                </Card>
+                </CardContent>
               </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="section-padding bg-linear-to-r from-primary-600 to-primary-700">
-        <div className="container-custom text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
-              Ready to Empower Your Farming Journey?
-            </h2>
-            <p className="text-xl text-primary-100 mb-8">
-              Join AgroYouth to learn, connect, and grow. Take interactive courses, access learning resources, and explore market opportunities — all in one platform.
-            </p>
-            
-            {!token && (
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/register">
-                  <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-                    Create Account
-                  </Button>
-                </Link>
-                <Link href="/courses">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto text-white border-white hover:bg-white hover:text-primary-600">
-                    Explore Courses
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container-custom">
+      <footer className="border-t border-gray-200 py-12  bg-gray-800 text-gray-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 text-2xl font-bold mb-4">
-              <span className="text-3xl">🌾</span>
-              <span>AgroYouth</span>
+            <div className="flex items-center justify-center gap-3 text-2xl font-bold mb-4">
+              <span className="text-4xl">🌾</span>
+              <span className="text-gray-300">AgroYouth</span>
             </div>
-            <p className="text-gray-400 mb-8">
-              Empowering young Liberian farmers through digital learning, market access, and community collaboration
+            <p className=" mb-8 max-w-2xl mx-auto">
+              Empowering young Liberian farmers through digital learning, market access, and community collaboration.
             </p>
-            <div className="flex justify-center space-x-8 text-sm">
-              <Link href="/courses" className="text-gray-400 hover:text-white transition-colors">
-               Learning Hub
+            <div className="flex flex-wrap justify-center gap-8 text-sm font-medium">
+              <Link href="/courses" className=" transition-colors">
+                Learning Hub
               </Link>
-              <Link href="/market" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="/market" className="transition-colors">
                 Market Access
               </Link>
               {!token && (
                 <>
-                  <Link href="/login" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/login" className="transition-colors">
                     Sign In
                   </Link>
-                  <Link href="/register" className="text-gray-400 hover:text-white transition-colors">
-                    Join
+                  <Link href="/register" className="transition-colors">
+                    Join Now
                   </Link>
                 </>
               )}
+            </div>
+            <div className="mt-8 pt-8 border-t border-gray-200">
+              <p className="text-sm">
+                © {new Date().getFullYear()} AgroYouth. Building the future of Liberian agriculture.
+              </p>
             </div>
           </div>
         </div>

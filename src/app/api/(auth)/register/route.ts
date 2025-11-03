@@ -6,36 +6,49 @@ import { signToken } from "@/utils/jwtToken";
 import { validateRegisterData } from "@/validator/registrationValidator";
 import { eq } from "drizzle-orm";
 import { sendResponse } from "@/utils/response";
-
-
+import { generateAnonymousAvatar, generateUniqueAnonymousName } from "@/utils/generateAnonymousName";
 
 export async function POST(request: NextRequest) {
   try {
     const validatedBody = await validateRegisterData(request);
-    if (validatedBody instanceof NextResponse) return validatedBody;
     
+    if (validatedBody instanceof NextResponse) {
+      return validatedBody;
+    }
+
     const { fullName, phoneNumber, userType, password } = validatedBody;
 
     const existingUser = await db.select().from(users)
       .where(eq(users.phoneNumber, phoneNumber));
-
+    
     if (existingUser.length > 0) {
-      return sendResponse(400, null, "Phone Number already exists");
+      return sendResponse(400, null, "Phone number already exists");
     }
 
     const userRole = await db.select({ id: roles.id, name: roles.name })
       .from(roles)
       .where(eq(roles.name, "User"))
       .limit(1);
-
+    
     if (userRole.length === 0) {
       return sendResponse(500, null, "User role not found");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    let anonymousName: string;
+    let anonymousAvatar: string;
+    try {
+      anonymousName = await generateUniqueAnonymousName();
+      anonymousAvatar = generateAnonymousAvatar();
+    } catch (error) {
+      const timestamp = Date.now().toString().slice(-6);
+      anonymousName = `Anonymous${timestamp}`;
+      anonymousAvatar = `default_gray_1`;
+    }
+
     const normalizedUserType = userType ? userType.toLowerCase() : "buyer";
-    const validUserType: "farmer" | "buyer" = 
+    const validUserType: "farmer" | "buyer" | "investor" =
       normalizedUserType === "farmer" ? "farmer" : "buyer";
 
     const insertUser = await db.insert(users).values({
@@ -43,11 +56,14 @@ export async function POST(request: NextRequest) {
       phoneNumber,
       password: hashedPassword,
       role: userRole[0].id,
-      userType: validUserType 
+      userType: validUserType,
+      anonymousName,
+      anonymousAvatar,
     }).returning({
       id: users.id,
       phoneNumber: users.phoneNumber,
       fullName: users.fullName,
+      anonymousName: users.anonymousName,
       role: users.role
     });
 
@@ -68,10 +84,23 @@ export async function POST(request: NextRequest) {
       token: token,
       expires: new Date(Date.now() + 15 * 60 * 1000)
     });
-    
-    return sendResponse(200, null, "Successfully registered");
 
+    return sendResponse(200, { 
+      token, 
+      user: {
+        id: newUser.id,
+        fullName: newUser.fullName,
+        phoneNumber: newUser.phoneNumber,
+        anonymousName: newUser.anonymousName
+      }
+    }, "Successfully registered");
+    
   } catch (error) {
-    return sendResponse(500, null, error instanceof Error ? error.message : "Internal Server Error");
+    console.error("Registration error:", error);
+    return sendResponse(
+      500, 
+      null, 
+      error instanceof Error ? error.message : "Internal Server Error"
+    );
   }
 }
