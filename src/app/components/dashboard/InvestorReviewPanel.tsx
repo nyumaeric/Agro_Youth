@@ -64,7 +64,6 @@ const InvestorReviewPanel: React.FC = () => {
   const [reviewAction, setReviewAction] = useState<'approve' | 'reject' | null>(null);
   const queryClient = useQueryClient();
 
-  // Fetch all applications
   const { data: applications, isLoading } = useQuery<Application[]>({
     queryKey: ['allDonationApplications'],
     queryFn: async () => {

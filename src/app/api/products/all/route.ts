@@ -1,6 +1,5 @@
 import db from "@/server/db";
 import { products } from "@/server/db/schema";
-import { getUserIdFromSession } from "@/utils/getUserIdFromSession";
 import { sendResponse } from "@/utils/response";
 import { NextRequest } from "next/server";
 
