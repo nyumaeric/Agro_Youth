@@ -117,14 +117,31 @@ export const POST = async (req:NextRequest, {params}: {params: Promise<{id: stri
     }
 };
 
-export const GET = async(req:NextRequest, {params}: {params: Promise<{id: string}>}) => {
-    try {
-        const { id } = await params;
-        const courseModule = await db.select().from(courseModules).where(eq(courseModules.courseId, id)).orderBy(desc(courseModules.createdAt))
-        return sendResponse(200, courseModule, "Module received Successfully")
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "An error occurred";
+export const GET = async (
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) => {
+  try {
+    const { id } = await params;
 
-        return sendResponse(500, null, errorMessage);
+    if (!id) {
+      return sendResponse(400, null, "Course ID is required");
     }
-}
+
+    const courseModule = await db
+      .select()
+      .from(courseModules)
+      .where(eq(courseModules.courseId, id))
+      .orderBy(desc(courseModules.createdAt));
+
+    if (!courseModule || courseModule.length === 0) {
+      return sendResponse(404, [], "No modules found for this course");
+    }
+
+    return sendResponse(200, courseModule, "Modules retrieved successfully");
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An error occurred";
+    return sendResponse(500, null, errorMessage);
+  }
+};

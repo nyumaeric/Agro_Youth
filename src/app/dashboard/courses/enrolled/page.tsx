@@ -273,14 +273,17 @@ const Courses: React.FC = () => {
     return true;
   });
 
+  const enrolledCoursesData = enrollmentsData?.data || []
+
+  console.log(enrolledCoursesData)
+
   const enrolledCourses = filteredCourses.filter(course => course.isEnrolled);
   const inProgressCourses = enrolledCourses.filter(course => !course.isCompleted);
-  const completedCourses = enrolledCourses.filter(course => course.isCompleted);
-
+  const completedCourses = enrolledCoursesData.filter((course: Course) => course.isCompleted);
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {enrolledCourses.length > 0 && (
+        {enrolledCoursesData.length > 0 && (
           <div className="mb-16">
             <div className="flex items-center gap-3 mb-8">
               <Award className="w-8 h-8 text-green-700" />
@@ -291,7 +294,6 @@ const Courses: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* In Progress Courses - Left Side (2 columns) */}
               <div className="lg:col-span-2">
                 {inProgressCourses.length > 0 && (
                   <>
@@ -303,7 +305,7 @@ const Courses: React.FC = () => {
                       </Badge>
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {inProgressCourses.map((course) => (
+                      {enrolledCoursesData.map((course: Course) => (
                         <CourseCard
                           key={course.id}
                           course={course}
@@ -331,7 +333,7 @@ const Courses: React.FC = () => {
                       </h3>
                     </div>
                     <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-                      {completedCourses.map((course) => (
+                      {completedCourses.map((course: Course) => (
                         <Link
                           key={course.id}
                           href={`/dashboard/courses/${course.id}/modules`}

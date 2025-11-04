@@ -23,24 +23,18 @@ const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white">
-        {/* Subtle background decoration */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-50 rounded-full blur-3xl opacity-60"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-emerald-50 rounded-full blur-3xl opacity-60"></div>
-        </div>
+      <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50 to-emerald pb-20">
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 lg:pt-32 lg:pb-32">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full mb-8 border border-green-100">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span className="text-sm font-medium text-green-700">Empowering Liberian Youth</span>
-            </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 tracking-tight">
               Welcome to{' '}
               <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                AgroYouth
+                Agro
+              </span>
+              <span className="bg-yellow-600 bg-clip-text text-transparent">
+                Youth
               </span>
             </h1>
 
@@ -97,6 +91,10 @@ const LandingPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <ShoppingBag className="w-4 h-4" />
                 <span>Market Access</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ShoppingBag className="w-4 h-4" />
+                <span>Apply for Donation</span>
               </div>
             </div>
           </div>
@@ -173,6 +171,7 @@ const LandingPage: React.FC = () => {
             <div className="flex items-center justify-center gap-3 text-2xl font-bold mb-4">
               <span className="text-4xl">🌾</span>
               <span className="text-gray-300">AgroYouth</span>
+              <span className="text-yellow-300">Youth</span>
             </div>
             <p className=" mb-8 max-w-2xl mx-auto">
               Empowering young Liberian farmers through digital learning, market access, and community collaboration.
