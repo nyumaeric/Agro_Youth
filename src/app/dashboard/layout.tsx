@@ -28,7 +28,7 @@ const DashboardContent = ({ children }: { children: React.ReactNode }) => {
               <AppSidebar />
               <SidebarInset>
                 <TopSide />
-                <div className="flex flex-1 flex-col gap-4 px-4 pt-0">
+                <div className="flex flex-1 flex-col gap-4 px-4 pt-0 bg-gray-50">
                   {children}
                 </div>
               </SidebarInset>
@@ -36,7 +36,6 @@ const DashboardContent = ({ children }: { children: React.ReactNode }) => {
           </Provider>
       </div>
       
-      {/* {hasPendingDecision && <PendingApprovalOverlay />} */}
     </div>
   );
 };

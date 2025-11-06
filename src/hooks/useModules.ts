@@ -13,17 +13,14 @@ export const useUpdateModules = () => {
       onSuccess: (response, variables) => {
         showToast(response.message || "Module updated successfully", "success");
         
-        // Invalidate the specific module query with correct keys
         queryClient.invalidateQueries({ 
           queryKey: ["course-module", variables.id, variables.ids] 
         });
         
-        // Invalidate the course query to update module list
         queryClient.invalidateQueries({ 
           queryKey: ["course", variables.id] 
         });
         
-        // Also invalidate course progress if you have it
         queryClient.invalidateQueries({ 
           queryKey: ["course-progress", variables.id] 
         });

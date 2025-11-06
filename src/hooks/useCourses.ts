@@ -1,6 +1,6 @@
 'use client';
 
-import { getCertificate, getSingleCourse, getSingleCourseModule, postCertificate } from '@/services/getCourse';
+import { getAdminCourse, getCertificate, getSingleCourse, getSingleCourseModule, postCertificate } from '@/services/getCourse';
 import showToast from '@/utils/showToast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -58,7 +58,30 @@ export const useCourse = (id: string) => {
   });
 };
 
+export const claimCertificate = async (courseId: string) => {
+  const response = await fetch(`/api/courses/${courseId}/certificate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to claim certificate");
+  }
+
+  return response.json();
+};
+
+
+
+export const useGetAdminCourse = () => {
+  return useQuery({
+    queryKey: ["admin-course"],
+    queryFn: async () => getAdminCourse(),
+  });
+};
 export const useCourseModule = (courseId: string, moduleId: string) => {
     return useQuery({
       queryKey: ["course-module", courseId, moduleId],
@@ -151,17 +174,13 @@ export const useCertificate = (courseId: string) => {
 
 export const useClaimCertificate = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
-    mutationFn: (courseId: string) => postCertificate(courseId),
+    mutationFn: (courseId: string) => claimCertificate(courseId),
     onSuccess: (data, courseId) => {
-      showToast("Certificate claimed successfully!", "success");
-      queryClient.invalidateQueries({ queryKey: ["certificate"] });
+      // Invalidate and refetch certificate data
+      queryClient.invalidateQueries({ queryKey: ["certificate", courseId] });
       queryClient.invalidateQueries({ queryKey: ["course", courseId] });
-    },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || "Failed to claim certificate";
-      showToast(message, "error");
     },
   });
 };

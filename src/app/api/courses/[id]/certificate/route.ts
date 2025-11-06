@@ -1,5 +1,5 @@
 import db from "@/server/db";
-import { certificates, course, users } from "@/server/db/schema";
+import { certificates, course, courseModules, users } from "@/server/db/schema";
 import { getUserIdFromSession } from "@/utils/getUserIdFromSession";
 import { sendResponse } from "@/utils/response";
 import { and, eq } from "drizzle-orm";
@@ -114,3 +114,48 @@ export const GET = async (req: NextRequest, { params }: { params: Promise<{ id: 
   }
 };
 
+export const PATCH = async (
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string; ids: string }> }
+) => {
+  try {
+    const { id: courseId, ids: moduleId } = await params;
+    const userId = await getUserIdFromSession();
+
+    if (!userId) {
+      return sendResponse(401, null, "Unauthorized");
+    }
+
+    const body = await req.json();
+    const { isCompleted } = body;
+
+    await db
+      .update(courseModules)
+      .set({ isCompleted })
+      .where(eq(courseModules.id, moduleId));
+
+    const allModules = await db
+      .select()
+      .from(courseModules)
+      .where(eq(courseModules.courseId, courseId));
+
+    const allCompleted = allModules.every((module) => module.isCompleted);
+
+    if (allCompleted && allModules.length > 0) {
+      await db
+        .update(course)
+        .set({ isCourseCompleted: true })
+        .where(eq(course.id, courseId));
+    } else {
+      await db
+        .update(course)
+        .set({ isCourseCompleted: false })
+        .where(eq(course.id, courseId));
+    }
+
+    return sendResponse(200, null, "Module updated successfully");
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "An error occurred";
+    return sendResponse(500, null, errorMessage);
+  }
+};

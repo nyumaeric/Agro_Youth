@@ -52,6 +52,16 @@ export const getCertificate = async (courseId: string) => {
   }
 };
 
+export const getAdminCourse = async () => {
+  try {
+    const response = await axios.get(`/api/courses/admin`);
+    console.log("response.data", response.data.data.data.data)
+    return response.data.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const postCertificate = async (courseId: string) => {
   try {
     const response = await axios.post<CertificateResponse>(`/api/courses/${courseId}/certificate`);

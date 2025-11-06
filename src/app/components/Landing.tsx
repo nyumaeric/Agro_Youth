@@ -78,8 +78,7 @@ const LandingPage: React.FC = () => {
               )}
             </div>
 
-            {/* Trust indicators */}
-            <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500">
+            <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-600 font-bold">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
                 <span>Interactive Learning</span>
@@ -124,7 +123,8 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 lg:mb-20">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
-              Everything You Need to Succeed
+              Everything You Need to {" "}
+              <span className='text-yellow-600'>Succeed</span>
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Digital tools and resources designed specifically for young Liberian farmers to learn, grow, and thrive in modern agriculture.
@@ -133,7 +133,7 @@ const LandingPage: React.FC = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 group bg-white">
+              <Card key={index} className="border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 group bg-gray-200">
                 <CardContent className="p-8">
                   <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300 text-center">
                     {feature.icon}
@@ -144,14 +144,14 @@ const LandingPage: React.FC = () => {
                   <p className="text-gray-600 mb-6 leading-relaxed text-base">
                     {feature.description}
                   </p>
-                  <div className="flex items-center gap-2 text-sm font-semibold text-green-700 mb-6 bg-green-50 px-4 py-2 rounded-lg w-fit">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-green-700 mb-6 px-4 py-2 rounded-lg w-fit">
                     <TrendingUp className="w-4 h-4" />
                     {feature.stats}
                   </div>
                   <Link href={feature.link}>
                     <Button 
                       variant="outline"
-                      className="w-full border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors flex items-center justify-center"
+                      className="w-full border-2 border-gray-900 hover:bg-gray-900 hover:text-white transition-colors flex items-center justify-center bg-gray-800 text-gray-300 cursor-pointer"
                     >
                       Learn More
                       <ArrowRight className="ml-2 w-4 h-4 flex-shrink-0" />
@@ -170,8 +170,8 @@ const LandingPage: React.FC = () => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 text-2xl font-bold mb-4">
               <span className="text-4xl">🌾</span>
-              <span className="text-gray-300">AgroYouth</span>
-              <span className="text-yellow-300">Youth</span>
+              <span className="text-gray-300">Agro</span>
+              <span className="text-yellow-600">Youth</span>
             </div>
             <p className=" mb-8 max-w-2xl mx-auto">
               Empowering young Liberian farmers through digital learning, market access, and community collaboration.

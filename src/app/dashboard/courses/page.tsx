@@ -177,9 +177,6 @@ const Courses: React.FC = () => {
     return {
       ...course,
       isEnrolled: enrolledCourseIds.has(course.id),
-      // completionPercentage: enrollmentData?.completionPercentage || 0,
-      // completedModules: enrollmentData?.completedModules || 0,
-      // totalModules: enrollmentData?.totalModules || course.moduleCount
     };
   });
 

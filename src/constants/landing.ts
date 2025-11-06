@@ -2,7 +2,7 @@ export const FEATURES = [
     {
       icon: '🌾',
       title: 'Interactive Courses',
-      description: 'Access comprehensive agricultural courses designed for Liberian youth. Learn modern farming techniques, traditional practices, and business skills through hands-on interactive lessons.',
+      description: 'Access comprehensive agricultural courses designed for Liberian youth. Learn modern farming techniques, traditional practices, and business skills through interactive lessons.',
       link: '/courses',
       stats: '50+ Interactive Learning Courses'
     },

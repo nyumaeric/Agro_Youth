@@ -56,6 +56,18 @@ export const donationApplications = pgTable('donation_applications', {
 export const courseCategory = pgEnum("course_categories", ["Cropping", "Livestock", "Agroforestry", "Irrigation", "Soil Health", "Pest Management"]);
 export const level = pgEnum("course_levels", ["Beginner", "Intermediate", "Advanced"]);
 export const language = pgEnum("course_languages", ["English", "French", "Kinyarwanda"]);
+
+
+export const ContentTypeEnum = pgEnum("content_type", [
+  "text",
+  "image",
+  "video",
+  "audio",
+  "link",
+]);
+
+export const ContentTypeEnumCourse = pgEnum("content_type", ["text", "video"]);
+
 export const course = pgTable("courses", {
     id: uuid("id").primaryKey().defaultRandom(),
     createdId: uuid("created_id").references(() => users.id).notNull(),
@@ -65,29 +77,27 @@ export const course = pgTable("courses", {
     level: level("level").notNull(),
     category: courseCategory("category").notNull(),
     language: language("language").notNull(),
+    contentType: ContentTypeEnumCourse("content_type").notNull(),
+    contentUrl: text("content_url"),
+    textContent: text("text_content"), 
+    isDownloadable: boolean("is_downloadable").default(false),
     isCourseCompleted: boolean("is_completed").notNull().default(false),
-    isDownloadable: boolean("isDownloadable").default(false),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
-})
-
-export const ContentTypeEnum = pgEnum("content_type", [
-  "text",
-  "image",
-  "video",
-  "audio",
-  "link",
-]);
+});
 export const courseModules = pgTable("course_modules", {
-    id: uuid("id").primaryKey().defaultRandom(),
-    courseId: uuid("course_id").references(() => course.id).notNull(),
-    title: text("title").notNull(),
-    content: text("description").notNull(),
-    isCompleted: boolean("is_completed").notNull().default(false),
-    durationTime: text("duration_time").notNull(),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-})
+  id: uuid("id").primaryKey().defaultRandom(),
+  courseId: uuid("course_id").references(() => course.id, { onDelete: 'cascade' }).notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  durationTime: text("duration_time").notNull(),
+  contentType: ContentTypeEnumCourse("content_type").notNull(),
+  contentUrl: text("content_url"),
+  textContent: text("text_content"),
+  isCompleted: boolean("is_completed").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
 
 export const enrollments = pgTable("enrollments", {

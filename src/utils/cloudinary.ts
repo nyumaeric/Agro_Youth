@@ -24,4 +24,31 @@ export async function uploadImage(imageUrl: string): Promise<string> {
       return error
     }
   }
+
+  export async function uploadVideo(file: File): Promise<string> {
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const base64 = buffer.toString('base64');
+        const dataUrl = `data:${file.type};base64,${base64}`;
+
+        const uploadResponse = await cloudinary.uploader.upload(dataUrl, {
+            folder: "course_videos",
+            resource_type: "video",
+            chunk_size: 6000000, 
+            eager: [
+                { 
+                    streaming_profile: "hd", 
+                    format: "m3u8" 
+                }
+            ],
+            eager_async: true,
+        });
+
+        return uploadResponse.secure_url;
+    } catch (err) {
+        const error = err instanceof Error ? err.message : "Video upload failed";
+        throw new Error(error);
+    }
+}
 export default cloudinary;

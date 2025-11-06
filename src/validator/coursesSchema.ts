@@ -13,8 +13,7 @@ export const courseValidation = z.object({
 
   timeToComplete: z
     .string()
-    .regex(/^\d+\s?(hours?|days?|weeks?|months?)$/i, "Time format example: '3 hours' or '2 weeks'")
-    .optional(),
+    .regex(/^\d+\s?(hours?|days?|weeks?|months?)$/i, "Time format example: '3 hours' or '2 weeks'"),
 
   category: z
     .enum(["Cropping", "Livestock", "Agroforestry", "Irrigation", "Soil Health", "Pest Management"])
@@ -26,5 +25,28 @@ export const courseValidation = z.object({
 
   language: z
     .enum(["English", "French", "Kinyarwanda"])
-    .default("English")
+    .default("English"),
+
+  contentType: z
+    .enum(["text", "video"])
+    .default("text"),
+
+  textContent: z
+    .string()
+    .min(50, "Text content must be at least 50 characters long")
+    .max(10000, "Text content must not exceed 10000 characters")
+    .optional(),
+
+  isDownloadable: z
+    .boolean()
+    .optional()
+    .default(false),
+}).refine((data) => {
+  if (data.contentType === "text" && !data.textContent) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Text content is required when content type is text",
+  path: ["textContent"]
 });

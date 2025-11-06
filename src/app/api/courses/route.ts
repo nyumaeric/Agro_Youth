@@ -1,6 +1,7 @@
 
 import db from "@/server/db";
 import { course, courseModules } from "@/server/db/schema";
+import { uploadVideo } from "@/utils/cloudinary";
 import { checkIfUserIsAdmin, getUserIdFromSession } from "@/utils/getUserIdFromSession";
 import { getPaginationParams } from "@/utils/pagination";
 import { sendResponse } from "@/utils/response";
@@ -9,70 +10,106 @@ import { desc, eq, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
-    try {
-      let body: unknown;
-      try {
-        body = await req.json();
-      } catch {
-        body = {};
+  try {
+      const userId = await getUserIdFromSession();
+      const isAdmin = await checkIfUserIsAdmin();
+
+      if (!isAdmin) {
+          return sendResponse(401, null, "Unauthorized");
       }
 
-       const userId = await getUserIdFromSession();
-       const [isAdmin] = await Promise.all([
-         checkIfUserIsAdmin(),
-       ]);
- 
-       const isAuthorized = isAdmin
-   
-       if (!isAuthorized || !userId) {
-         return sendResponse(401, null, "Unauthorized");
-       }
+      const formData = await req.formData();
+      
+      // Extract form fields
+      const title = formData.get("title") as string;
+      const description = formData.get("description") as string;
+      const timeToComplete = formData.get("timeToComplete") as string;
+      const level = formData.get("level") as string;
+      const category = formData.get("category") as string;
+      const language = formData.get("language") as string;
+      const contentType = formData.get("contentType") as string;
+      const textContent = formData.get("textContent") as string | null;
+      const videoFile = formData.get("video") as File | null;
+      const isDownloadable = formData.get("isDownloadable") === "true";
 
+      // Validate basic fields
+      const validationData = {
+          title,
+          description,
+          timeToComplete,
+          level,
+          category,
+          language,
+          contentType,
+          textContent: textContent || undefined,
+          isDownloadable
+      };
 
-
-      const data = courseValidation.safeParse(body);
-      if (!data.success) {
-        const errors = Object.fromEntries(
-          Object.entries(data.error.flatten().fieldErrors).map(([k, v]) => [k, v ?? []])
-        );
-        return NextResponse.json(
-          { status: "Error!", errors, message: "Validation failed" }, 
-          { status: 400 }
-        );
+      const validation = courseValidation.safeParse(validationData);
+      
+      if (!validation.success) {
+          const errors = Object.fromEntries(
+              Object.entries(validation.error.flatten().fieldErrors).map(([k, v]) => [k, v ?? []])
+          );
+          return NextResponse.json(
+              { status: "Error!", errors, message: "Validation failed" },
+              { status: 400 }
+          );
       }
-  
-      const { title, description, timeToComplete,level,category, language } = data.data;
-      if (!title || !description || !timeToComplete || !level || !category || !language) {
-        return sendResponse(400, null, "Missing required fields");
+
+      let contentUrl: string | null = null;
+
+      // Handle video upload
+      if (contentType === "video") {
+          if (!videoFile) {
+              return sendResponse(400, null, "Video file is required when content type is video");
+          }
+
+          // Validate video file
+          const validVideoTypes = ["video/mp4", "video/mpeg", "video/quicktime", "video/x-msvideo"];
+          if (!validVideoTypes.includes(videoFile.type)) {
+              return sendResponse(400, null, "Invalid video format. Supported formats: MP4, MPEG, MOV, AVI");
+          }
+
+          // Check file size (max 100MB)
+          const maxSize = 100 * 1024 * 1024; // 100MB
+          if (videoFile.size > maxSize) {
+              return sendResponse(400, null, "Video file size must be less than 100MB");
+          }
+
+          // Upload to Cloudinary
+          try {
+              contentUrl = await uploadVideo(videoFile);
+          } catch (error) {
+              const errorMessage = error instanceof Error ? error.message : "Video upload failed";
+              return sendResponse(500, null, errorMessage);
+          }
       }
-      await db.insert(course).values({
-        createdId: userId,
-        title,
-        description,
-        level,
-        category,
-        language,
-        timeToComplete: timeToComplete
-      });
 
-      // const coursesToInsert = Array.from({ length: 40 }, (_, index) => ({
-      //   createdId: userId,
-      //   title: `${title} - Part ${index + 1}`,
-      //   description: `${description} (Copy ${index + 1})`,
-      //   level,
-      //   category,
-      //   language,
-      //   timeToComplete
-      // }));
-      // await db.insert(course).values(coursesToInsert);
-      return sendResponse(200, null, "Course created successfully");
+      const [newCourse] = await db.insert(course).values({
+          createdId: userId as string,
+          title: validation.data.title,
+          description: validation.data.description,
+          level: validation.data.level as any,
+          category: validation.data.category as any,
+          language: validation.data.language as any,
+          timeToComplete: validation.data.timeToComplete,
+          contentType: validation.data.contentType as any,
+          contentUrl: contentUrl,
+          textContent: validation.data.contentType === "text" ? validation.data.textContent : null,
+          isDownloadable: validation.data.isDownloadable,
+          isCourseCompleted: false,
+      }).returning();
 
-    } catch (error) {
+      return sendResponse(200, newCourse, "Course created successfully");
+
+  } catch (error) {
+      console.error("Course creation error:", error);
       const errorMessage = error instanceof Error ? error.message : "An error occurred";
-
       return sendResponse(500, null, errorMessage);
-    }
+  }
 };
+
 
 type CountResult = { count: number };
  

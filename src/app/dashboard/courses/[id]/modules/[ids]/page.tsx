@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useCourseModule, useCourse } from "@/hooks/useCourses";
 import { useUpdateModules } from "@/hooks/useModules";
-import { Loader, Loader2 } from "lucide-react";
+import { Loader, Loader2, FileText, Video } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 
 export default function ModulePage() {
@@ -91,6 +91,7 @@ export default function ModulePage() {
                     Back to Course
                 </Button>
 
+                {/* Module Header */}
                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
                     <div className="p-8">
                         <div className="flex items-center gap-3 mb-4">
@@ -105,28 +106,68 @@ export default function ModulePage() {
                             <span className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
                                 {module.durationTime}
                             </span>
+                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
+                                {module.contentType === "video" ? (
+                                    <>
+                                        <Video className="w-3 h-3" />
+                                        Video
+                                    </>
+                                ) : (
+                                    <>
+                                        <FileText className="w-3 h-3" />
+                                        Text
+                                    </>
+                                )}
+                            </span>
                         </div>
                         
                         <h1 className="text-3xl font-bold text-gray-900 mb-4">{module.title}</h1>
-                        <p className="text-gray-600 leading-relaxed text-lg">{module.content}</p>
+                        <p className="text-gray-600 leading-relaxed text-lg">{module.description}</p>
                     </div>
                 </div>
 
+                {/* Module Content */}
                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
                     <div className="p-8">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">Module Content</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-6">Module Content</h2>
                         
-                        <div className="prose max-w-none">
-                            <p className="text-gray-600">
-                                This is where your module learning content will appear. You can add:
-                            </p>
-                            <ul className="text-gray-600 space-y-2 mt-4">
-                                <li>Video lessons</li>
-                                <li>Reading materials</li>
-                                <li>Interactive exercises</li>
-                                <li>Quizzes and assessments</li>
-                            </ul>
-                        </div>
+                        {module.contentType === "video" && module.contentUrl ? (
+                            <div className="space-y-4">
+                                <div className="relative bg-black rounded-lg overflow-hidden" style={{ paddingBottom: "56.25%" }}>
+                                    <video 
+                                        className="absolute top-0 left-0 w-full h-full"
+                                        controls
+                                        controlsList="nodownload"
+                                        preload="metadata"
+                                    >
+                                        <source src={module.contentUrl} type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                                {module.textContent && (
+                                    <div className="mt-6">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-3">Additional Notes</h3>
+                                        <div className="prose max-w-none text-gray-600 whitespace-pre-wrap">
+                                            {module.textContent}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : module.contentType === "text" && module.textContent ? (
+                            <div className="prose max-w-none">
+                                <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                    {module.textContent}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center py-12 bg-gray-50 rounded-lg">
+                                <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-200 rounded-full mb-4">
+                                    <FileText className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <p className="text-gray-600 mb-2">No content available for this module</p>
+                                <p className="text-sm text-gray-500">Content will be added soon</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -166,7 +207,16 @@ export default function ModulePage() {
                             variant="outline"
                             onClick={handleNextModule}
                         >
-                            {hasNextModule ? "Next Module" : "Back to Course"}
+                            {hasNextModule ? (
+                                <>
+                                    Next Module
+                                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </>
+                            ) : (
+                                "Back to Course"
+                            )}
                         </Button>
                     </div>
                 </div>

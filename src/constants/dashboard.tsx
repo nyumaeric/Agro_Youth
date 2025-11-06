@@ -54,12 +54,12 @@ export const adminMenuItems: NavItem[] = [
   },
   {
     title: "Courses",
-    href: "/dashboard/courses",
+    href: "/dashboard/courses/create",
     icon: createIcon(BookOpen),
     items: [
       {
         title: "My Courses",
-        href: "/dashboard/courses"
+        href: "/dashboard/courses/admin"
       }
     ]
   },

@@ -154,14 +154,14 @@ export default function InvestorsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-6xl mx-auto py-16">
+      <div className="max-w-6xl mx-auto py-28">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3 mb-2">
+              <h1 className="text-4xl font-bold bg-gray-50 flex items-center gap-3 mb-2 text-yellow-600">
                 Available Investors
               </h1>
-              <p className="text-gray-600 ml-15">
+              <p className="text-gray-600">
                 Connect with investors who can support your agricultural ventures
               </p>
             </div>
